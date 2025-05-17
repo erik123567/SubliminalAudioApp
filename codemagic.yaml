@@ -1,0 +1,32 @@
+workflows:
+  default-workflow:
+    name: Build iOS for TestFlight
+    environment:
+      xcode: latest
+      node: latest
+      cocoapods: default
+      env:
+        NODE_OPTIONS: '--max_old_space_size=4096'
+    scripts:
+      - name: Install Dependencies
+        script: |
+          npm install
+          cd ios
+          pod install
+          cd ..
+      - name: Build iOS
+        script: |
+          xcodebuild -workspace ios/SubliminalAudioApp.xcworkspace \
+          -scheme SubliminalAudioApp \
+          -sdk iphoneos \
+          -configuration Release \
+          -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive archive
+      - name: Export IPA
+        script: |
+          xcodebuild -exportArchive \
+          -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive \
+          -exportOptionsPlist ios/exportOptions.plist \
+          -exportPath $CM_BUILD_DIR
+
+    artifacts:
+      - $CM_BUILD_DIR/*.ipa

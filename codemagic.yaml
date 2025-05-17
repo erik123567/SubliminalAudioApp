@@ -19,7 +19,11 @@ workflows:
         script: |
           npm install
           cd ios
-          pod install --repo-update
+          echo "Running pod install..."
+          pod install --repo-update || {
+            echo "Error: pod install failed"
+            exit 1
+          }
           cd ..
 
       - name: Verify Workspace

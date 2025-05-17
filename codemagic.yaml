@@ -11,8 +11,14 @@ workflows:
         script: |
           npm install
           cd ios
-          pod install
+          pod install || exit 1  # Exit the build if pod install fails
           cd ..
+      - name: Verify Workspace
+        script: |
+          if [ ! -f "ios/SubliminalAudioApp.xcworkspace" ]; then
+            echo "Error: .xcworkspace file not found!"
+            exit 1
+          fi
       - name: Build iOS
         script: |
           xcodebuild -workspace ios/SubliminalAudioApp.xcworkspace \

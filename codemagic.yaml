@@ -7,14 +7,13 @@ workflows:
       cocoapods: default
 
     scripts:
-      - name: Clean CocoaPods Cache
+      - name: Clean Project and Cache
         script: |
           cd ios
-          echo "Cleaning Pods, Podfile.lock, and CocoaPods cache..."
+          echo "Removing Pods, Podfile.lock, and caches..."
           rm -rf Pods/
           rm -rf Podfile.lock
           pod cache clean --all
-          pod repo update
           cd ..
 
       - name: Install Node Modules
@@ -25,7 +24,7 @@ workflows:
       - name: Install CocoaPods
         script: |
           cd ios
-          echo "Running pod install with repo update..."
+          echo "Running pod install..."
           pod install --repo-update || {
             echo "Error: pod install failed"
             exit 1

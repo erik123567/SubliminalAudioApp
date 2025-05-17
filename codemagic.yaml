@@ -7,61 +7,41 @@ workflows:
       cocoapods: default
 
     scripts:
-      - name: Clean Project and Cache
+      - name: Clean Pods & Cache
         script: |
           cd ios
-          echo "Removing Pods, Podfile.lock, and CocoaPods cache..."
-          rm -rf Pods/
-          rm -rf Podfile.lock
+          rm -rf Pods/ Podfile.lock
           pod cache clean --all
           cd ..
 
-      - name: Install Node Modules
+      - name: Install JS Dependencies
         script: |
-          echo "Installing npm packages..."
           npm install
 
-      - name: Install CocoaPods with Local Podspec
+      - name: Install CocoaPods
         script: |
           cd ios
-          echo "Running pod install..."
-          pod install --repo-update || {
-            echo "Error: pod install failed"
-            exit 1
-          }
+          pod install --repo-update || { echo "pod install failed"; exit 1; }
           cd ..
 
       - name: Verify Workspace
         script: |
-          if [ ! -f "ios/SubliminalAudioApp.xcworkspace" ]; then
-            echo "Error: .xcworkspace file not found!"
-            exit 1
-          else
-            echo ".xcworkspace file successfully generated."
-          fi
+          test -f ios/SubliminalAudioApp.xcworkspace || { echo "No .xcworkspace!"; exit 1; }
 
-      - name: Build iOS
+      - name: Build & Archive
         script: |
-          echo "Starting iOS build..."
           xcodebuild -workspace ios/SubliminalAudioApp.xcworkspace \
-          -scheme SubliminalAudioApp \
-          -sdk iphoneos \
-          -configuration Release \
-          -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive archive || {
-            echo "Error: iOS build failed"
-            exit 1
-          }
+            -scheme SubliminalAudioApp \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive archive
 
       - name: Export IPA
         script: |
-          echo "Exporting IPA..."
           xcodebuild -exportArchive \
-          -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive \
-          -exportOptionsPlist ios/exportOptions.plist \
-          -exportPath $CM_BUILD_DIR || {
-            echo "Error: Export IPA failed"
-            exit 1
-          }
+            -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive \
+            -exportOptionsPlist ios/exportOptions.plist \
+            -exportPath $CM_BUILD_DIR
 
     artifacts:
       - $CM_BUILD_DIR/*.ipa

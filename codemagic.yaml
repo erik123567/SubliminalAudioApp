@@ -7,7 +7,7 @@ workflows:
       cocoapods: default
 
     scripts:
-      - name: Clean CocoaPods Cache
+      - name: Clean Previous Pods and Cache
         script: |
           cd ios
           rm -rf Pods/
@@ -15,10 +15,15 @@ workflows:
           pod cache clean --all
           cd ..
 
-      - name: Install Dependencies
+      - name: Install Node Modules
         script: |
+          echo "Installing npm packages..."
           npm install
+
+      - name: Install CocoaPods
+        script: |
           cd ios
+          echo "Running pod install..."
           pod install --repo-update || {
             echo "Error: pod install failed"
             exit 1
@@ -30,22 +35,32 @@ workflows:
           if [ ! -f "ios/SubliminalAudioApp.xcworkspace" ]; then
             echo "Error: .xcworkspace file not found!"
             exit 1
+          else
+            echo ".xcworkspace file successfully generated."
           fi
 
       - name: Build iOS
         script: |
+          echo "Starting iOS build..."
           xcodebuild -workspace ios/SubliminalAudioApp.xcworkspace \
           -scheme SubliminalAudioApp \
           -sdk iphoneos \
           -configuration Release \
-          -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive archive
+          -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive archive || {
+            echo "Error: iOS build failed"
+            exit 1
+          }
 
       - name: Export IPA
         script: |
+          echo "Exporting IPA..."
           xcodebuild -exportArchive \
           -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive \
           -exportOptionsPlist ios/exportOptions.plist \
-          -exportPath $CM_BUILD_DIR
+          -exportPath $CM_BUILD_DIR || {
+            echo "Error: Export IPA failed"
+            exit 1
+          }
 
     artifacts:
       - $CM_BUILD_DIR/*.ipa

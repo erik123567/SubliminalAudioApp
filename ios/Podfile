@@ -5,11 +5,15 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 target 'SubliminalAudioApp' do
   config = use_native_modules!
 
+  # Disable internal boost reference in React Native
   use_react_native!(
-    :path => config[:reactNativePath]
+    :path => config[:reactNativePath],
+    :hermes_enabled => true,
+    :production => false,
+    :podspecs => []
   )
 
-  # Reference the local boost podspec
+  # Force the use of our local boost podspec
   pod 'boost', :path => './boost-local/boost.podspec'
 
   post_install do |installer|

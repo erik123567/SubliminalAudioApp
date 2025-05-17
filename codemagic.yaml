@@ -7,10 +7,10 @@ workflows:
       cocoapods: default
 
     scripts:
-      - name: Clean All Caches and Pods
+      - name: Clean Project and Cache
         script: |
           cd ios
-          echo "Removing Pods, Podfile.lock, and caches..."
+          echo "Removing Pods, Podfile.lock, and CocoaPods cache..."
           rm -rf Pods/
           rm -rf Podfile.lock
           pod cache clean --all

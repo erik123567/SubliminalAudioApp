@@ -5,8 +5,7 @@ workflows:
       xcode: latest
       node: latest
       cocoapods: default
-      env:
-        NODE_OPTIONS: '--max_old_space_size=4096'
+
     scripts:
       - name: Install Dependencies
         script: |

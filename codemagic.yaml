@@ -7,7 +7,7 @@ workflows:
       cocoapods: default
 
     scripts:
-      - name: Clean Project and Cache
+      - name: Clean All Caches and Pods
         script: |
           cd ios
           echo "Removing Pods, Podfile.lock, and caches..."
@@ -21,7 +21,7 @@ workflows:
           echo "Installing npm packages..."
           npm install
 
-      - name: Install CocoaPods
+      - name: Install CocoaPods with Local Podspec
         script: |
           cd ios
           echo "Running pod install..."

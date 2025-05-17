@@ -9,12 +9,12 @@ target 'SubliminalAudioApp' do
     :path => config[:reactNativePath]
   )
 
-  # Remove boost completely to let React Native handle it internally
+  # Reference the local boost podspec
+  pod 'boost', :path => './boost-local/boost.podspec'
 
   post_install do |installer|
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
-        # Prevent conflicts with boost
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
       end
     end

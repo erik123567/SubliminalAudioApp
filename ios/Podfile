@@ -17,11 +17,12 @@ target 'SubliminalAudioApp' do
   end
 
   # Now CocoaPods will only see and install your local boost
-  pod 'boost', :path => './boost-local/boost.podspec'
+  pod 'boost', :podspec => 'boost-local/boost.podspec'
 
   post_install do |installer|
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
+        # work around M1 simulator arch issues
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
       end
     end

@@ -9,9 +9,10 @@ target 'SubliminalAudioApp' do
     :path => config[:reactNativePath]
   )
 
-  # Remove the manual boost podspec to avoid conflicts
-  # Allow React Native to handle it internally
+  # Explicitly specify the boost podspec to bypass the checksum error
+  pod 'boost', :podspec => 'https://raw.githubusercontent.com/CocoaPods/Specs/master/Specs/3/f/5/boost/1.76.0/boost.podspec'
 
+  # Post install hook for architecture compatibility
   post_install do |installer|
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|

@@ -6,13 +6,10 @@ target 'SubliminalAudioApp' do
   config = use_native_modules!
 
   use_react_native!(
-    :path => config[:reactNativePath],
-    :hermes_enabled => true,
-    :production => false,
-    :podspecs => []
+    :path => config[:reactNativePath]
   )
 
-  # Explicitly specify the boost podspec to resolve conflicts
+  # Remove internal boost and explicitly reference the podspec
   pod 'boost', '1.76.0', :podspec => 'https://raw.githubusercontent.com/CocoaPods/Specs/master/Specs/3/f/5/boost/1.76.0/boost.podspec'
 
   post_install do |installer|

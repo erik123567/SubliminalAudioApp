@@ -7,13 +7,14 @@ workflows:
       cocoapods: default
 
     scripts:
-      - name: Clean Previous Pods and Cache
+      - name: Clean CocoaPods Cache
         script: |
           cd ios
-          echo "Cleaning CocoaPods cache and Podfile.lock..."
+          echo "Cleaning Pods, Podfile.lock, and CocoaPods cache..."
           rm -rf Pods/
           rm -rf Podfile.lock
           pod cache clean --all
+          pod repo update
           cd ..
 
       - name: Install Node Modules

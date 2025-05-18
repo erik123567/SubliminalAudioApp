@@ -11,9 +11,10 @@ workflows:
         script: |
           npm install
 
-      - name: Remove internal RN boost spec
+      - name: Patch RN Autolinker to Remove Internal boost.podspec
         script: |
-          sed -i '' '/boost.podspec/d' node_modules/react-native/third-party-podspecs/boost.podspec
+          # delete any line in the RN pod helper that mentions boost.podspec
+          sed -i '' '/third-party-podspecs\/boost.podspec/d' node_modules/react-native/scripts/react_native_pods.rb
 
       - name: Clean Pods & Cache
         script: |

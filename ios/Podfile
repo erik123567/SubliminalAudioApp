@@ -1,5 +1,4 @@
 platform :ios, '14.0'
-require 'fileutils'
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
@@ -7,24 +6,15 @@ target 'SubliminalAudioApp' do
   config = use_native_modules!
 
   use_react_native!(
-    :path => config[:reactNativePath]
+    path: config[:reactNativePath]
   )
 
-  # 1) Delete RN’s bundled boost.podspec so it never loads
-  pre_install do |installer|
-    internal = File.expand_path(
-      '../node_modules/react-native/third-party-podspecs/boost.podspec',
-      __dir__
-    )
-    FileUtils.rm_f(internal) if File.exist?(internal)
-  end
-
-  # 2) Install only your patched, .tar.gz–based spec
-  pod 'boost', :podspec => './boost-local/boost.podspec'
+  # Only install your local boost
+  pod 'boost', path: './boost-local'
 
   post_install do |installer|
     react_native_post_install(installer)
-    # Apple Silicon simulator fix
+    # Apple Silicon simulator tweak
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'

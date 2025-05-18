@@ -6,15 +6,14 @@ target 'SubliminalAudioApp' do
   config = use_native_modules!
 
   use_react_native!(
-    path: config[:reactNativePath]
+    :path => config[:reactNativePath],
+    :hermes_enabled => false,     # ← disable Hermes (removes boost dependency)
+    :fabric_enabled => false
   )
-
-  # Only install your local boost
-  pod 'boost', path: './boost-local'
 
   post_install do |installer|
     react_native_post_install(installer)
-    # Apple Silicon simulator tweak
+    # Apple Silicon simulator fix
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'

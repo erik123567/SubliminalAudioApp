@@ -6,14 +6,14 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'Boost Software License', :file => 'LICENSE' }
   s.authors          = { 'Boost' => 'https://www.boost.org' }
 
-  # Let CocoaPods fetch & unpack the tar.bz2 for us
+  # Use the .tar.gz file (far more compatible)
   s.source           = {
-    :http => 'https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2'
+    :http => 'https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz'
   }
 
   s.requires_arc     = false
 
-  # Only pull in the headers (adjust if you need more files)
+  # Just pick up headers; adjust if you need more
   s.public_header_files = 'boost/**/*.hpp'
   s.source_files        = 'boost/**/*.{hpp,ipp}'
 end

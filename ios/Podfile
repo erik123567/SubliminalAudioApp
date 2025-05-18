@@ -6,20 +6,27 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 target 'SubliminalAudioApp' do
   config = use_native_modules!
 
-  # 1) Exclude boost from RN autolinking
+  # 1) Override React Native's internal boost podspec
+  pre_install do |installer|
+    spec_dir = File.expand_path('../node_modules/react-native/third-party-podspecs', __dir__)
+    internal = File.join(spec_dir, 'boost.podspec')
+    FileUtils.rm_f(internal) if File.exist?(internal)
+    FileUtils.cp(
+      File.join(__dir__, 'boost-local', 'boost.podspec'),
+      internal
+    )
+  end
+
+  # 2) Let autolinking bring in boost from third-party-podspecs (your copy)
   use_react_native!(
-    :path => config[:reactNativePath],
-    :exclude => ['boost']
+    :path => config[:reactNativePath]
   )
 
-  # 2) Inject only your local boost podspec
-  pod 'boost', :podspec => File.join(__dir__, 'boost-local', 'boost.podspec')
-
   post_install do |installer|
-    # RN post‑install work
+    # Standard RN post-install tasks
     react_native_post_install(installer)
 
-    # Exclude arm64 on simulators
+    # Exclude arm64 for simulator on M1
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'

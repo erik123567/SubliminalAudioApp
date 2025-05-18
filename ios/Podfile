@@ -19,11 +19,11 @@ target 'SubliminalAudioApp' do
     FileUtils.rm_f(internal) if File.exist?(internal)
   end
 
-  # 2) Let CocoaPods install only your local boost
-  pod 'boost', :path => './boost-local'
+  # 2) Tell CocoaPods to load your local boost spec (so it fetches & unpacks remotely)
+  pod 'boost', :podspec => './boost-local/boost.podspec'
 
   post_install do |installer|
-    # Standard RN post-install hook
+    # Standard RN post‑install hook
     react_native_post_install(installer)
 
     # Work around Apple Silicon simulator arch issues

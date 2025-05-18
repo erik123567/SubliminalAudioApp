@@ -7,21 +7,21 @@ workflows:
       cocoapods: default
 
     scripts:
+      - name: Install JS Dependencies
+        script: |
+          npm install
+
+      - name: Remove internal Boost reference from RN helper
+        script: |
+          # delete any line in the RN pod script that points at boost.podspec
+          sed -i '' '/boost.podspec/d' node_modules/react-native/scripts/react_native_pods.rb
+
       - name: Clean Pods & Cache
         script: |
           cd ios
           rm -rf Pods/ Podfile.lock
           pod cache clean --all
           cd ..
-
-      - name: Install JS Dependencies
-        script: |
-          npm install
-
-      - name: Patch React-Native’s boost.podspec
-        script: |
-          # remove any checksum line that CocoaPods is choking on
-          sed -i '' '/s\.checksum/d' node_modules/react-native/third-party-podspecs/boost.podspec
 
       - name: Install CocoaPods
         script: |
@@ -35,15 +35,18 @@ workflows:
 
       - name: Build & Archive
         script: |
-          xcodebuild -workspace ios/SubliminalAudioApp.xcworkspace \
+          xcodebuild \
+            -workspace ios/SubliminalAudioApp.xcworkspace \
             -scheme SubliminalAudioApp \
             -sdk iphoneos \
             -configuration Release \
-            -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive archive
+            -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive \
+            archive
 
       - name: Export IPA
         script: |
-          xcodebuild -exportArchive \
+          xcodebuild \
+            -exportArchive \
             -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive \
             -exportOptionsPlist ios/exportOptions.plist \
             -exportPath $CM_BUILD_DIR

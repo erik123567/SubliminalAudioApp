@@ -1,20 +1,19 @@
 Pod::Spec.new do |s|
-    s.name        = "boost"
-    s.version     = "1.76.0"
-    s.summary     = "Boost C++ Libraries"
-    s.homepage    = "https://www.boost.org"
-    s.license     = { :type => "Boost Software License", :file => "LICENSE" }
-    s.authors     = { "Boost" => "https://www.boost.org" }
-  
-    s.source      = {
-      :http => "https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2"
-    }
-  
-    # checksum removed to avoid mismatch
-    # s.checksum = "f0397ba6e982c4450f27bf32a2a83292aba035b827a5623a14636ea583318c41"
-  
-    s.requires_arc     = false
-    s.prepare_command  = "tar -xjf boost_1_76_0.tar.bz2"
-    s.source_files     = "boost/**/*"
-  end
-  
+  s.name             = 'boost'
+  s.version          = '1.76.0'
+  s.summary          = 'Boost C++ Libraries'
+  s.homepage         = 'https://www.boost.org'
+  s.license          = { :type => 'Boost Software License', :file => 'LICENSE' }
+  s.authors          = { 'Boost' => 'https://www.boost.org' }
+
+  # Let CocoaPods fetch & unpack the tar.bz2 for us
+  s.source           = {
+    :http => 'https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.bz2'
+  }
+
+  s.requires_arc     = false
+
+  # Only pull in the headers (adjust if you need more files)
+  s.public_header_files = 'boost/**/*.hpp'
+  s.source_files        = 'boost/**/*.{hpp,ipp}'
+end

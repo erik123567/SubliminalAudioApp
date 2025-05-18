@@ -1,32 +1,20 @@
 platform :ios, '14.0'
-require 'fileutils'
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'SubliminalAudioApp' do
   config = use_native_modules!
 
-  # 1) Remove RN's internal boost spec
-  pre_install do |installer|
-    internal = File.expand_path('../node_modules/react-native/third-party-podspecs/boost.podspec', __dir__)
-    FileUtils.rm_f(internal) if File.exist?(internal)
-    # Copy in your local podspec so autolinking picks it up
-    FileUtils.cp(
-      File.join(__dir__, 'boost-local', 'boost.podspec'),
-      internal
-    )
-  end
-
-  # 2) Let RN autolinking pick up boost (your local copy) + the rest of RN pods
   use_react_native!(
-    :path => config[:reactNativePath]
+    :path => config[:reactNativePath],
+    :hermes_enabled => false   # ← disable Hermes so boost is never pulled in
   )
 
+  # Standard RN post‑install hook
   post_install do |installer|
-    # Standard RN post‑install hook
     react_native_post_install(installer)
 
-    # Fix arm64 in simulator on Apple Silicon
+    # Work around M1 simulator arch issues
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'

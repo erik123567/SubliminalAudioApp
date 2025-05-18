@@ -18,6 +18,13 @@ workflows:
         script: |
           npm install
 
+      - name: Patch internal boost checksum
+        script: |
+          cd ios
+          echo "Removing checksum from RN's internal boost.podspec"
+          sed -i '' '/^ *s\.checksum/d' ../node_modules/react-native/third-party-podspecs/boost.podspec
+          cd ..
+
       - name: Install CocoaPods
         script: |
           cd ios

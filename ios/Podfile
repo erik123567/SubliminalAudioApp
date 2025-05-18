@@ -1,4 +1,5 @@
 platform :ios, '14.0'
+require 'fileutils'
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
@@ -6,15 +7,28 @@ target 'SubliminalAudioApp' do
   config = use_native_modules!
 
   use_react_native!(
-    :path => config[:reactNativePath],
-    :hermes_enabled => false   # ← disable Hermes so boost is never pulled in
+    :path => config[:reactNativePath]
   )
 
-  # Standard RN post‑install hook
+  # ==== PATCH boost.podspec: remove bad checksum line ====
+  pre_install do |installer|
+    boost_spec = File.expand_path(
+      '../node_modules/react-native/third-party-podspecs/boost.podspec',
+      __dir__
+    )
+    if File.exist?(boost_spec)
+      text    = File.read(boost_spec)
+      # remove any line that starts with "  s.checksum"
+      patched = text.lines.reject { |l| l =~ /^\s*s\.checksum/ }.join
+      File.write(boost_spec, patched)
+    end
+  end
+
   post_install do |installer|
+    # Default RN post‑install
     react_native_post_install(installer)
 
-    # Work around M1 simulator arch issues
+    # Work around Apple Silicon simulator arch issues
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'

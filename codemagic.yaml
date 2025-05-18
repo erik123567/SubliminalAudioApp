@@ -1,20 +1,51 @@
-- name: Install JS Dependencies
-  script: |
-    npm install
+workflows:
+  default-workflow:
+    name: Build iOS for TestFlight
+    environment:
+      xcode: latest
+      node: latest
+      cocoapods: default
 
-- name: Remove internal RN boost spec
-  script: |
-    sed -i '' '/boost.podspec/d' node_modules/react-native/third-party-podspecs/boost.podspec
+    scripts:
+      - name: Install JS Dependencies
+        script: |
+          npm install
 
-- name: Clean Pods & Cache
-  script: |
-    cd ios
-    rm -rf Pods/ Podfile.lock
-    pod cache clean --all
-    cd ..
+      - name: Remove internal RN boost spec
+        script: |
+          sed -i '' '/boost.podspec/d' node_modules/react-native/third-party-podspecs/boost.podspec
 
-- name: Install CocoaPods
-  script: |
-    cd ios
-    pod install --repo-update
-    cd ..
+      - name: Clean Pods & Cache
+        script: |
+          cd ios
+          rm -rf Pods/ Podfile.lock
+          pod cache clean --all
+          cd ..
+
+      - name: Install CocoaPods
+        script: |
+          cd ios
+          pod install --repo-update || { echo "pod install failed"; exit 1; }
+          cd ..
+
+      - name: Verify Workspace
+        script: |
+          test -f ios/SubliminalAudioApp.xcworkspace || { echo "No .xcworkspace!"; exit 1; }
+
+      - name: Build & Archive
+        script: |
+          xcodebuild -workspace ios/SubliminalAudioApp.xcworkspace \
+            -scheme SubliminalAudioApp \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive archive
+
+      - name: Export IPA
+        script: |
+          xcodebuild -exportArchive \
+            -archivePath $CM_BUILD_DIR/SubliminalAudioApp.xcarchive \
+            -exportOptionsPlist ios/exportOptions.plist \
+            -exportPath $CM_BUILD_DIR
+
+    artifacts:
+      - $CM_BUILD_DIR/*.ipa

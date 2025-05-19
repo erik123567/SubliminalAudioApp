@@ -6,7 +6,10 @@ Pod::Spec.new do |s|
   s.license          = { :type => 'Boost Software License', :file => 'LICENSE' }
   s.authors          = { 'Boost' => 'https://www.boost.org' }
 
-  # No external source, everything is in boost-local/boost/
+  # REQUIRED: point at the local folder
+  s.source           = { :path => '.' }
+
+  # All headers under boost/
   s.source_files        = 'boost/**/*.{hpp,ipp}'
   s.public_header_files = 'boost/**/*.hpp'
   s.requires_arc        = false
